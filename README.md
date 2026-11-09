@@ -44,7 +44,7 @@ Flash the `.img` to the microSD card with balenaEtcher or Raspberry Pi Imager. W
 
 Run the DTB selector from the card's BOOT partition (`dtb_selector_macos`) and pick **Clone R36s → Clone Type 1 Panel 2**.
 
-If it asks about the battery, pick **option 2** (`arkos4clone`). Option 1 reads 0%. Don't pick an overclock: the script keeps the RAM at a fixed speed.
+The battery and overclock answers don't matter: the script always sets the `arkos4clone` battery driver (the Rockchip one reads 0%) and removes any overclock.
 
 ### 4. Run the script
 
@@ -71,7 +71,7 @@ Put the card in the device and power it on. First boot repartitions the card, in
 1. **Checks:** it refuses internal disks and checks the bootloader dump. It also checks that BOOT starts after the bootloader area and that `boot.ini` loads the type1 panel2 DTB.
 2. **Kernel:** copies the arkos4clone **5.10** kernel (`files/Image`) to BOOT.
 3. **DTB:** copies the **clone type1 panel2 5.10 DTB with the DMC disabled** (`files/rk3326-r36s-type1-panel2-linux.dtb`) to BOOT.
-4. **`extlinux/extlinux.conf`:** writes it with the boot arguments from `boot.ini`.
+4. **`extlinux/extlinux.conf`:** writes it with the boot arguments from `boot.ini`, minus any overclock, plus `rk817_gauge=arkos4clone` for the battery.
 5. **GPU driver:** if the image is older than arkos4clone's 5.10 support, it adds `files/fix510/` to BOOT and hooks it into `clone.sh`. On first boot it installs the 5.10 modules, the `g29p1` Mali driver, `mali-select` and the Vulkan files, then deletes itself. The log is in `BOOT/fix510.log`.
 6. **Bootloader:** writes `files/open_boot16M.bin` to sectors 64–32767. That's the idbloader at sector 64, U-Boot at 16384 and trust at 24576. The partition table in sector 0 is left alone. Every part is built from Rockchip's public sources and binaries. No vendor dump is needed (see [Rebuilding the bootloader](#rebuilding-the-bootloader)).
 

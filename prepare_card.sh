@@ -39,8 +39,10 @@ BOOT=$(diskutil info "${DISK}s1" | awk -F': *' '/Mount Point/{print $2}')
 [[ -n "$BOOT" && -f "$BOOT/boot.ini" ]] || die "${DISK}s1 is not a mounted (d)ArkOS BOOT partition"
 grep -q "^load .*$DTB" "$BOOT/boot.ini" || die "boot.ini does not load $DTB: run dtb_selector and pick Clone Type 1 Panel 2"
 
-BOOTARGS=$(sed -n 's/^setenv bootargs "\(.*\)"/\1/p' "$BOOT/boot.ini" | tr -d '\r')
+BOOTARGS=$(sed -n 's/^setenv bootargs "\(.*\)"/\1/p' "$BOOT/boot.ini" | tr -d '\r' |
+  sed -E 's/ (rk817_gauge|max_cpufreq|boot_cpufreq|max_gpufreq|boot_gpufreq|max_ddrfreq|boot_ddrfreq)=[^ ]*//g')
 [[ -n "$BOOTARGS" ]] || die "no bootargs in boot.ini"
+BOOTARGS="$BOOTARGS rk817_gauge=arkos4clone"
 
 echo "== kernel + DTB"
 cp -X "$FILES/Image" "$BOOT/Image"
