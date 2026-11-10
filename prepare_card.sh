@@ -63,7 +63,7 @@ if [[ -f "$BOOT/consoles/kernel/5.10/Image" ]]; then
 else
   echo "== 5.10 GPU/modules payload"
   mkdir -p "$BOOT/fix510"
-  cp -X "$FILES/fix510/payload.tar.xz" "$FILES/fix510/install.sh" "$BOOT/fix510/"
+  cp -X "$FILES/fix510/payload.tar.xz" "$FILES/fix510/install.sh" "$FILES/fix510/rk817-codec" "$BOOT/fix510/"
 
   HOOK='[[ -f /boot/fix510/install.sh ]] && bash /boot/fix510/install.sh >> /boot/fix510.log 2>&1'
   TARGET="$BOOT/clone.sh"

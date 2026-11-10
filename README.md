@@ -72,7 +72,7 @@ Put the card in the device and power it on. First boot repartitions the card, in
 2. **Kernel:** copies the arkos4clone **5.10** kernel (`files/Image`) to BOOT.
 3. **DTB:** copies the **clone type1 panel2 5.10 DTB with the DMC disabled** (`files/rk3326-r36s-type1-panel2-linux.dtb`) to BOOT.
 4. **`extlinux/extlinux.conf`:** writes it with the boot arguments from `boot.ini`, minus any overclock, plus `rk817_gauge=arkos4clone` for the battery.
-5. **GPU driver:** if the image is older than arkos4clone's 5.10 support, it adds `files/fix510/` to BOOT and hooks it into `clone.sh`. On first boot it installs the 5.10 modules, the `g29p1` Mali driver, `mali-select` and the Vulkan files, then deletes itself. The log is in `BOOT/fix510.log`.
+5. **GPU driver:** if the image is older than arkos4clone's 5.10 support, it adds `files/fix510/` to BOOT and hooks it into `clone.sh`. On first boot it installs the 5.10 modules, the `g29p1` Mali driver, `mali-select`, the Vulkan files and the `rk817-codec` sleep hook, then deletes itself. The log is in `BOOT/fix510.log`.
 6. **Bootloader:** writes `files/open_boot16M.bin` to sectors 64–32767. That's the idbloader at sector 64, U-Boot at 16384 and trust at 24576. The partition table in sector 0 is left alone. Every part is built from Rockchip's public sources and binaries. No vendor dump is needed (see [Rebuilding the bootloader](#rebuilding-the-bootloader)).
 
 ## Why each piece is needed
@@ -84,6 +84,7 @@ Put the card in the device and power it on. First boot repartitions the card, in
 | Completely dead with a 4.4 DTB | This U-Boot sets up the power chip and display from the kernel DTB, and a 4.4-style DTB stops it before it turns on the backlight | The 5.10 kernel and DTB only |
 | Boot hangs in `rockchip-dmc`, then `rk3x-i2c ff180000.i2c: timeout` spam | Changing RAM speed through the firmware breaks things. The stock DTB keeps the RAM fixed at 528 MHz. | `/dmc` disabled in the DTB |
 | `mali ... stride 48 passed to job_submit isn't supported` | Release `20261008` came out before arkos4clone's 5.10 support, so it has the 4.4 GPU driver (`rxp0`) | `files/fix510` payload |
+| No sound after sleep until reboot | Sleep resets the RK817 codec registers (muted DAC, clocks off) and the 5.10 driver doesn't restore them | `files/fix510/rk817-codec` sleep hook: saves the codec registers before sleep and writes back the changed ones on wake |
 
 The panel, timings, reset and power GPIOs, buttons, sticks and headphone detect all match **clone type1 panel2**. The "R36S-V20" DTB in [southoz/dArkOSRE-R36](https://github.com/southoz/dArkOSRE-R36/tree/main/files/BOOT/dtb/clone/R36S-V20%202025-05-18%202549) is not for this unit: it has the panel1 init sequence.
 

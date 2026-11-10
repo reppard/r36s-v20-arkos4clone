@@ -11,5 +11,6 @@ done
 chmod 755 /usr/local/sbin/mali-select
 depmod -a 5.10.252-arkos4clone
 /usr/local/sbin/mali-select
+install -m 755 /boot/fix510/rk817-codec /usr/lib/systemd/system-sleep/rk817-codec
 rm -rf /boot/fix510
 sync
